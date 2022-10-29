@@ -1,0 +1,10 @@
+numpy >= 1.20.1
+opencv-python
+Pillow
+pytest
+requests
+scikit-image
+scipy
+sklearn
+augraphy
+fastapi[all]
