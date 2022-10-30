@@ -4,20 +4,18 @@ from augraphy import *
 import cv2
 import numpy as np
 
-
 app = FastAPI()
 
 
 @app.post("/augment")
-async def create_file(request: Request):
+async def upload(file: UploadFile = File(...)):
     message = "Augmentation done!"
     out_response = None
     read_status  = 1
     
+    
     try:
-        form = await request.form()
-        filename = form["upload_file"].filename
-        contents = await form["upload_file"].read()
+         contents = await file.read()
     except:
         message = "There was an error in uploading the file."
         read_status = 0
