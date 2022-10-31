@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'augraphy-demo'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_756D137B76C1469685167DB05EE26044 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9373AFDA51944A56BD4966AC93203E7A }}
