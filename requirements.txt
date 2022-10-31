@@ -8,4 +8,6 @@ scipy
 sklearn
 augraphy
 fastapi[all]
-uvicorn[standard]
+uvicorn
+uvloop
+httptools
