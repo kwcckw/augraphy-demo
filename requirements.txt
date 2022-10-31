@@ -9,5 +9,4 @@ sklearn
 augraphy
 fastapi[all]
 uvicorn
-uvloop
 httptools
