@@ -1,22 +1,52 @@
-from fastapi import File, UploadFile,FastAPI, Request, Response
-
+from fastapi import File, UploadFile,FastAPI
+from fastapi.responses import FileResponse
+from augraphy import *
+import cv2
+import numpy as np
 
 app = FastAPI()
 
 
-@app.get("/")
-async def root2():
-    return {"message": "Hello World"}
+@app.post("/augment")
+async def upload(file: UploadFile = File(...)):
+    message = "Augmentation done!"
+    out_response = None
+    read_status  = 1
+    
+    
+    try:
+         contents = await file.read()
+    except:
+        message = "There was an error in uploading the file."
+        read_status = 0
+   
+    if read_status:
+        try:
+            augmented_image = augment_image(contents)
+            out_response = FileResponse("augmented_image.png")
+        except Exception:
+            message = Exception #"Invalid file type!"   
+        
+    return out_response if out_response is not None else message
 
-@app.get("/get")
-async def get_name(name:str):
-    return {"name": name}
+
+
+def augment_image(contents: str):
     
-@app.post("/get2")
-async def get_number(number:int):
-    return {"number": number*2}
+    np_array = np.fromstring(contents, np.uint8)
+    image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
+    
+    cv2.imwrite("input_image.png", image)
+    
+    ink_phase   = [InkBleed(p=1)]
+    paper_phase = [DirtyRollers(p=1)]
+    post_phase  = [WaterMark(p=1)]
+    pipeline    = AugraphyPipeline(ink_phase, paper_phase, post_phase)
+    
+    data_output = pipeline.augment(image)
+    augmented_image = data_output["output"]
     
     
-@app.post("/get3")
-async def get_name2(name2:str):
-    return {"name": name2}
+    cv2.imwrite("augmented_image.png", augmented_image)
+
+    return augmented_image
