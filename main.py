@@ -35,16 +35,17 @@ def augment_image(contents: str):
     
     np_array = np.fromstring(contents, np.uint8)
     image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
+    augmented_image = image
     
-    cv2.imwrite("input_image.png", image)
+    # cv2.imwrite("input_image.png", image)
     
-    ink_phase   = [InkBleed(p=1)]
-    paper_phase = [DirtyRollers(p=1)]
-    post_phase  = [WaterMark(p=1)]
-    pipeline    = AugraphyPipeline(ink_phase, paper_phase, post_phase)
+    # ink_phase   = [InkBleed(p=1)]
+    # paper_phase = [DirtyRollers(p=1)]
+    # post_phase  = [WaterMark(p=1)]
+    # pipeline    = AugraphyPipeline(ink_phase, paper_phase, post_phase)
     
-    data_output = pipeline.augment(image)
-    augmented_image = data_output["output"]
+    # data_output = pipeline.augment(image)
+    # augmented_image = data_output["output"]
     
     
     cv2.imwrite("augmented_image.png", augmented_image)
