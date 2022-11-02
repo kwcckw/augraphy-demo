@@ -1,7 +1,7 @@
 from fastapi import File, UploadFile,FastAPI
 from fastapi.responses import FileResponse
 import numpy as np
-import cv2
+
 
 app = FastAPI()
 
@@ -15,9 +15,15 @@ async def upload(file: UploadFile = File(...)):
     try:
          contents = await file.read()
          np_array = np.fromstring(contents, np.uint8)
-         image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
-         cv2.imwrite("augmented_image.png", image)
-         out_response = FileResponse("augmented_image.png")
+         
+         
+         # augmented_image = open('augmented_image.png', 'wb')
+         # augmented_image.write(base64.b64decode((np_array)))
+         # augmented_image.close()                
+         
+         # image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
+         # cv2.imwrite("augmented_image.png", image)
+         # out_response = FileResponse("augmented_image.png")
     except:
         message = "There was an error in uploading the file."
         read_status = 0
