@@ -4,6 +4,8 @@ from augraphy import *
 import cv2
 import numpy as np
 import os
+import io
+from starlette.responses import StreamingResponse
 
 app = FastAPI()
 
@@ -13,7 +15,7 @@ async def upload(file: UploadFile = File(...)):
     message = "Augmentation done!"
     out_response = None
     read_status  = 1
-    current_path = os.path.abspath(os.getcwd()) + "/"
+    # current_path = os.path.abspath(os.getcwd()) + "/"
     
     try:
          contents = await file.read()
@@ -24,7 +26,10 @@ async def upload(file: UploadFile = File(...)):
     if read_status:
         try:
             augmented_image = augment_image(contents)
-            out_response = FileResponse(current_path+ "augmented_image.png")
+            
+            _, img_bytes = cv2.imencode(".png", augmented_image)
+            out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), media_type="image/png")
+            # out_response = FileResponse(current_path+ "augmented_image.png")
         except Exception:
             message = Exception #"Invalid file type!"   
         
@@ -33,12 +38,12 @@ async def upload(file: UploadFile = File(...)):
 
 
 def augment_image(contents: str):
-    current_path = os.path.abspath(os.getcwd()) + "/"
+    # current_path = os.path.abspath(os.getcwd()) + "/"
     np_array = np.fromstring(contents, np.uint8)
     image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
     augmented_image = image
     
-    cv2.imwrite(current_path+"input_image.png", image)
+    # cv2.imwrite(current_path+"input_image.png", image)
     
     ink_phase   = [InkBleed(p=1)]
     paper_phase = [DirtyRollers(p=1)]
@@ -49,6 +54,6 @@ def augment_image(contents: str):
     augmented_image = data_output["output"]
     
     
-    cv2.imwrite(current_path+"augmented_image.png", augmented_image)
+    # cv2.imwrite(current_path+"augmented_image.png", augmented_image)
 
     return augmented_image
