@@ -2,6 +2,7 @@ from fastapi import File, UploadFile,FastAPI
 from fastapi.responses import FileResponse
 import numpy as np
 import cv2
+from augraphy import *
 
 app = FastAPI()
 
