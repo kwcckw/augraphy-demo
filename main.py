@@ -9,7 +9,7 @@ from starlette.responses import StreamingResponse
 import aiofiles
 
 app = FastAPI()
-CHUNK_SIZE = 16 * 16
+CHUNK_SIZE = 512 * 512
 
 
 @app.post("/")
