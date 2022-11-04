@@ -10,3 +10,5 @@ augraphy
 fastapi[all]
 uvicorn
 httptools
+aiofiles
+httpx

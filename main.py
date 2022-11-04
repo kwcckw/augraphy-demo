@@ -1,37 +1,58 @@
-from fastapi import File, UploadFile,FastAPI
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, File, UploadFile, Form, status
+from fastapi.exceptions import HTTPException
 from augraphy import *
 import cv2
 import numpy as np
 import os
 import io
 from starlette.responses import StreamingResponse
+import aiofiles
 
 app = FastAPI()
+CHUNK_SIZE = 16 * 16
 
 
 @app.post("/")
-async def upload(file: UploadFile = File(...)):
+async def upload(file: UploadFile = File(...), data: str = Form(...)):
     message = "Augmentation done!"
     out_response = None
     read_status  = 1
     # current_path = os.path.abspath(os.getcwd()) + "/"
     
+    
     try:
-         contents = await file.read()
-    except:
-        message = "There was an error in uploading the file."
+        
+        filepath = os.path.join('./', os.path.basename(file.filename))
+        async with aiofiles.open(filepath, 'wb') as f:
+            while chunk := await file.read(CHUNK_SIZE):
+                await f.write(chunk)
+
+        augmented_image = cv2.imread(filepath)
+
+        _, img_bytes = cv2.imencode(".png", augmented_image)
+        out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), media_type="image/png")
+
+    except Exception:
+        
         read_status = 0
+        message = "There was an error uploading the file"
+        
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail='There was an error uploading the file')
+    finally:
+        await file.close()
+
+        
    
-    if read_status:
-        try:
-            augmented_image = augment_image(contents)
+    # if read_status:
+    #     try:
+    #         augmented_image = augment_image(contents)
             
-            _, img_bytes = cv2.imencode(".png", augmented_image)
-            out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), media_type="image/png")
-            # out_response = FileResponse(current_path+ "augmented_image.png")
-        except Exception:
-            message = Exception #"Invalid file type!"   
+    #         _, img_bytes = cv2.imencode(".png", augmented_image)
+    #         out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), media_type="image/png")
+    #         # out_response = FileResponse(current_path+ "augmented_image.png")
+    #     except Exception:
+    #         message = Exception #"Invalid file type!"   
         
     return out_response if out_response is not None else message
 
