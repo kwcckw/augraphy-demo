@@ -47,7 +47,7 @@ async def upload(file: UploadFile = File(...), file_name: str = Form(...)):
     return out_response if out_response is not None else message
 
 @app.post("/augment_default")
-async def upload(file: UploadFile = File(...), file_name: str = Form(...)):
+async def upload2(file: UploadFile = File(...), file_name: str = Form(...)):
     message = "Augmentation done!"
     out_response = None
     read_status  = 1
