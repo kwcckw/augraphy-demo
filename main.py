@@ -5,18 +5,21 @@ import cv2
 import numpy as np
 import os
 import io
+from time import time
 from starlette.responses import StreamingResponse
 import aiofiles
+
 
 app = FastAPI()
 CHUNK_SIZE = 512 * 512
 
 
 @app.post("/")
-async def upload(file: UploadFile = File(...)):
+async def augment_basic(file: UploadFile = File(...)):
     message = "Augmentation done!"
     out_response = None
     read_status  = 1
+    time_elapsed = 0
 
     try:
         filepath = os.path.join('./', os.path.basename(file.filename))
@@ -38,19 +41,22 @@ async def upload(file: UploadFile = File(...)):
     # read successfully, proceed with augmentation
     if read_status:
         try:
-            augmented_image = augment_image_basic(image)     
+            start_time = time()
+            augmented_image = augment_image_basic(image)    
+            time_elapsed = int(time() - start_time)            
             _, img_bytes = cv2.imencode(".png", augmented_image)
-            out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), media_type="image/png")
+            out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), headers={"time_elapsed":str(time_elapsed)}, media_type="image/png")
         except Exception:
             message = Exception #"Invalid file type!"   
-        
+    
     return out_response if out_response is not None else message
 
 @app.post("/augment_default")
-async def upload2(file: UploadFile = File(...), file_name: str = Form(...)):
+async def augment_default(file: UploadFile = File(...)):
     message = "Augmentation done!"
     out_response = None
     read_status  = 1
+    time_elapsed = 0
 
     try:
         filepath = os.path.join('./', os.path.basename(file.filename))
@@ -72,9 +78,11 @@ async def upload2(file: UploadFile = File(...), file_name: str = Form(...)):
     # read successfully, proceed with augmentation
     if read_status:
         try:
-            augmented_image = augment_image_default(image)     
+            start_time = time()
+            augmented_image = augment_image_default(image)
+            time_elapsed = time() - start_time     
             _, img_bytes = cv2.imencode(".png", augmented_image)
-            out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), media_type="image/png")
+            out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), headers={"time_elapsed":str(time_elapsed)}, media_type="image/png")
         except Exception:
             message = Exception #"Invalid file type!"   
         
