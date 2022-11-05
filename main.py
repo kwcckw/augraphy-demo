@@ -13,7 +13,7 @@ CHUNK_SIZE = 512 * 512
 
 
 @app.post("/")
-async def upload(file: UploadFile = File(...), file_name: str = Form(...)):
+async def upload(file: UploadFile = File(...)):
     message = "Augmentation done!"
     out_response = None
     read_status  = 1
