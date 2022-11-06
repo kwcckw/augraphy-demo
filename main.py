@@ -43,7 +43,7 @@ async def augment_basic(file: UploadFile = File(...)):
         try:
             start_time = time()
             augmented_image = augment_image_basic(image)    
-            time_elapsed = int(time() - start_time)            
+            time_elapsed = time() - start_time           
             _, img_bytes = cv2.imencode(".png", augmented_image)
             out_response = StreamingResponse(io.BytesIO(img_bytes.tobytes()), headers={"time_elapsed":str(time_elapsed)}, media_type="image/png")
         except Exception:
